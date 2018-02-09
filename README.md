@@ -18,8 +18,6 @@
 * 列表：[https://news-at.zhihu.com/api/4/news/before/20180208](https://news-at.zhihu.com/api/4/news/before/20180208)
 * 详情：[https://news-at.zhihu.com/api/4/news/9670311](https://news-at.zhihu.com/api/4/news/9670311)
 
-## 源码
-[https://github.com/czero1995/wepy_daily.git](https://github.com/czero1995/wepy_daily.git)
 
 ## 运行
     git clone https://github.com/czero1995/wepy_daily.git
