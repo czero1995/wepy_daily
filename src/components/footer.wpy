@@ -1,0 +1,63 @@
+<style lang="less">
+@import "../styles/base.less";
+.footer {
+  position: fixed;
+  box-sizing: border-box;
+  bottom: 0;
+  width: 100%;
+  background: @theme_background;
+  color: @base_color;
+  height: 80rpx;
+  line-height: 80rpx;
+}
+.share{
+  background: @theme_background;
+  color: @base_color;
+  margin:0;
+}
+.share::after{
+  border:none;
+}
+</style>
+<template>
+  <view class="footer flex_around">
+    <button open-type="share" class="share">分享给朋友</button>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+export default class News extends wepy.component {
+  data = {
+    list: [
+      {
+        id: "0",
+        title: "loading"
+      }
+    ]
+  };
+
+  methods = {
+    onShareAppMessage: function(res) {
+      if (res.from === "button") {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      return {
+        title: "自定义转发标题",
+        path: "/page/user?id=123",
+        success: function(res) {
+          // 转发成功
+          console.log(res)
+        },
+        fail: function(res) {
+          // 转发失败
+          console.log(res)
+        }
+      };
+    }
+  };
+
+  onLoad() {}
+}
+</script>
+

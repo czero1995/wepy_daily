@@ -1,0 +1,240 @@
+<style lang='less'>
+@import "../styles/base.less";
+swiper-item {
+  overflow: auto !important;
+}
+.top_swiper {
+  height: 300rpx;
+  image {
+    width: 100%;
+    height: 100%;
+  }
+}
+.content {
+  background: #f2f2f2;
+}
+.content.active {
+  padding-top: 0;
+}
+.content_scroll {
+  height: 100vh;
+}
+.list {
+  margin: 20rpx;
+  padding: 20rpx;
+  font-size: 32rpx;
+  align-items: flex-start;
+  background: #fff;
+}
+.list_img {
+  margin-left: 30rpx;
+  image {
+    width: 180rpx;
+    height: 140rpx;
+  }
+}
+.icon_close {
+  margin-top: 6rpx;
+  margin-left: 6px;
+}
+.news_item--source {
+  color: #ccc;
+  font-size: 26rpx;
+}
+.refresh {
+  position: fixed;
+  bottom: 60rpx;
+  right: 40rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 100rpx;
+  background: @theme_background;
+  z-index: 3;
+}
+.refresh_tip {
+  font-size: 28rpx;
+  height: 0;
+  opacity: 0;
+  line-height: 80rpx;
+  text-align: center;
+  background: @theme_background;
+  color: @base_color;
+}
+.refresh_img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 60rpx;
+  height: 60rpx;
+}
+.loadTip {
+  background: #f2f2f2;
+  display: block;
+  text-align: center;
+  font-size: 24rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  letter-spacing: 20rpx;
+  color: #ccc;
+}
+.top_title {
+  position: absolute;
+  display: block;
+  top: 200rpx;
+  left: 30rpx;
+  right: 30rpx;
+  margin: auto;
+  font-size: 32rpx;
+  color: @base_color;
+}
+</style>
+<template>
+  <view class="index">
+    <view class="refresh_tip" animation="{{refreshTipAnimation}}">数据刷新成功...</view>
+          <view class="content"> 
+            <swiper class="top_swiper" indicator-dots indicator-active-color="#6495ED" autoplay interval="3000" duration="1000">
+              <block wx:for="{{zhTop}}" wx:key="{{index}}}">
+                <swiper-item>
+                  <image src="{{item.image}}" />
+                  <text class="top_title">{{item.title}}</text>
+                </swiper-item>
+              </block>
+            </swiper>
+            <navigator wx:for="{{zhList}}" wx:key="{{index}}" url="detail?id={{item.id}}" hover-class="none">
+              <view class="flex_spacebetween list">
+                <text>{{item.title}}</text>
+                <view class="list_img" wx:for="{{item.images}}" wx:key="{{index}}">
+                    <image src="{{item}}"></image>
+                </view>   
+              </view>
+            </navigator>
+            <text class="loadTip" wx:if="{{loadMore}}">加载中...</text> 
+          </view>                                                                                                     
+    <view class="refresh" @tap="onTop"><image class="refresh_img" src="../images/top.png"></image></view>    
+</view>
+</template>
+<script>
+import wepy from 'wepy'
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '知乎日报',
+    enablePullDownRefresh: 'true',
+    backgroundColor: '#eee'
+  };
+  data = {
+    dateTime: 0,  //  获取时间
+    zhList: [], //  知乎日报列表
+    zhTop: [], // 知乎日报轮播
+    refreshTipAnimation: {}, // 刷新提示动画
+    refreshInterval: {}, //  刷新渲染循环
+    refreshNum: 1, //  刷新循环计数
+    refreshIs: false, //  刷新状态
+    loadMore: false //  上拉加载提示
+  };
+  methods = {
+    /** 回到顶部 */
+    onTop() {
+      wepy.pageScrollTo({
+        scrollTop: 0
+      })
+    }
+  }
+
+  /** 下拉刷新 */
+  onPullDownRefresh() {
+    this.refreshIs = true
+    wepy.showNavigationBarLoading()
+    this.getDate()
+    setTimeout(() => {
+      this.getZhiHuList()
+    }, 2000)
+  }
+
+  /** 上拉加载 */
+  onReachBottom() {
+    this.loadMore = true
+    wepy.showNavigationBarLoading()
+    setTimeout(() => {
+      this.loadMore = false
+      this.dateTime--
+      this.getZhiHuList()
+      this.$apply()
+    }, 2000)
+  }
+
+  /** 获取日期 */
+  getDate() {
+    let date = new Date()
+    let year = date.getFullYear()
+    let month = date.getMonth() + 1
+    month = month < 10 ? '0' + month : month
+    let day = date.getDate()
+    day = day < 10 ? '0' + day : day
+    this.dateTime = year.toString() + month.toString() + day.toString()
+  }
+  /** 获取知乎轮播 */
+  getZhiHuTop() {
+    const that = this
+    wepy.request({
+      url: that.$parent.config.zhapi + 'latest',
+      success: function(res) {
+        that.zhTop = res.data.top_stories
+        that.$apply()
+      }
+    })
+  }
+  /** 获取知乎日报列表 */
+  getZhiHuList() {
+    const that = this
+    wepy.request({
+      url: that.$parent.config.zhapi + 'before/' + that.dateTime,
+      success: function(res) {
+        if (that.refreshIs) {
+          that.zhList = []
+          wepy.stopPullDownRefresh()
+          that.refreshInterval = setInterval(
+            function() {
+              that.refreshNum++
+              // 提示下拉效果
+              that.tipAnimation.height(40).step()
+              that.tipAnimation.opacity(1).step()
+              that.refreshTipAnimation = this.tipAnimation.export()
+              that.$apply()
+            }.bind(that),
+            200
+          )
+          setTimeout(() => {
+            that.tipAnimation.height(0).step()
+            that.tipAnimation.opacity(0).step()
+            that.refreshTipAnimation = that.tipAnimation.export()
+            clearInterval(that.refreshInterval)
+            that.refreshIs = false
+            that.$apply()
+          }, 1600)
+        }
+        wepy.hideNavigationBarLoading()
+        that.zhList = [...that.zhList, ...res.data.stories]
+        that.$apply()
+      }
+    })
+  }
+
+  onShow() {
+    // 下拉动画
+    this.tipAnimation = wepy.createAnimation({
+      duration: 1200,
+      timingFunction: 'ease'
+    })
+    this.refreshTipAnimation = this.tipAnimation.export()
+  }
+
+  async onLoad() {
+    await this.getDate()
+    await this.getZhiHuTop()
+    await this.getZhiHuList()
+  }
+}
+</script>

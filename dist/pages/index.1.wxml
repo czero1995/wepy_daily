@@ -1,0 +1,32 @@
+
+  <view class="index">
+    <scroll-view class="nav" scroll-x scroll-left="{{scrollLeft}}">
+        <view class="nav_item" bindtap="swichNav"  wx:for="{{navList}}" wx:key="*this" data-wpyswichnav-a="{{item}}" data-wpyswichnav-b="{{index}}">
+          <text class="{{currentTab == index?'active':''}}">{{item.showname}}</text>
+          </view>
+    </scroll-view>
+    <swiper class="content" current="{{currentTab}}" duration="300" bindchange="switchTab" data-wpyswitchtab-a="{{index}}">
+        <swiper-item  wx:for="{{newsList}}" wx:key="*this">
+            <scroll-view scroll-y style="height:100%" bindscrolltoupper="loadRefresh" bindscrolltolower="loadNext" data-wpyloadnext-a="e">
+                <block wx:for="{{newsList}}" wx:key="*this">
+                  <view bindtap="onDetail" data-wpyondetail-a="{{item}}">
+                    <view class="news_item flex" wx:if="{{item.litpictype == 1}}">
+                      <image class="oneImg" src="{{item.litpic}}"/>
+                      <text>{{item.title}}</text>
+                    </view>
+                    <view class="news_item" wx:if="{{item.litpictype == 3}}">                  
+                      <text>{{item.title}}</text>
+                      <view class="flex_spacebetween"> 
+<view wx:for="{{item.litpic}}" wx:key="*this">
+                         <image src="{{item}}" class="oneImg "/>
+                      </view>
+                      </view>
+                      
+                    </view>  
+                  </view>                                                                                                      
+                </block>
+            </scroll-view>
+        </swiper-item>
+    </swiper> 
+      
+</view>

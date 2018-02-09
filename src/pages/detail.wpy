@@ -1,0 +1,86 @@
+<style lang="less">
+@import "../styles/base.less";
+@import "../plugins/wxParse/wxParse.wxss";
+.detail {
+  padding: 20rpx 0 80rpx 0;
+  box-sizing: border-box;
+}
+.detail_top--image {
+  width: 100%;
+  height: 300rpx;
+}
+.title {
+  display: block;
+  padding: 0 40rpx;
+  font-size: 28rpx;
+  text-align: center;
+  position: absolute;
+  top: 260rpx;
+  color: @base_color;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+.wxParse-p {
+  margin: 10rpx 20rpx;
+  font-size: 28rpx;
+}
+.wxParse-img {
+  display: block;
+  margin: 0 auto;
+}
+.wxParse-inline {
+  text-align: justify;
+}
+</style>
+<template>
+  <view class="detail">
+    <import src="../plugins/wxParse/wxParse.wxml" />
+    <image class="detail_top--image" src="{{detailContent.image}}"></image>
+    <view class="title">{{detailContent.title}}</view>
+    <template is="wxParse" data="{{wxParseData:body.nodes}}"></template>
+    <footer></footer>
+  </view>
+</template>
+
+<script>
+import wepy from "wepy";
+import footer from "../components/footer";
+import WxParse from "../plugins/wxParse/wxParse";
+export default class Detail extends wepy.page {
+  config = {
+    navigationBarTitleText: "详情页",
+  };
+  components = {
+    footer: footer
+  };
+  data = {
+    detailContent: {},
+    detailBody: {},
+    id: ""
+  };
+  getContent() {
+    const that = this;
+    wepy.request({
+      url: that.$parent.config.zhapi + that.id,
+      success: function(res) {
+        that.detailContent = res.data;
+        that.detailBody = that.detailContent.body;
+        console.log(that.detailContent);
+        that.detailBody = WxParse.wxParse(
+          "body",
+          "html",
+          that.detailBody,
+          that,
+          0
+        );
+        that.$apply();
+      }
+    });
+  }
+  async onLoad(option) {
+    this.id = option.id;
+    await this.getContent();
+  }
+}
+</script>

@@ -1,0 +1,24 @@
+
+  <view class="index">
+    <view class="refresh_tip" animation="{{refreshTipAnimation}}">数据刷新成功...</view>
+          <view class="content"> 
+            <swiper class="top_swiper" indicator-dots indicator-active-color="#6495ED" autoplay interval="3000" duration="1000">
+              <block  wx:for="{{zhTop}}" wx:key="{{index}}}">
+                <swiper-item>
+                  <image src="{{item.image}}"/>
+                  <text class="top_title">{{item.title}}</text>
+                </swiper-item>
+              </block>
+            </swiper>
+            <navigator  wx:for="{{zhList}}" wx:key="{{index}}" url="detail?id={{item.id}}" hover-class="none">
+              <view class="flex_spacebetween list">
+                <text>{{item.title}}</text>
+                <view class="list_img" wx:for="{{item.images}}" wx:key="{{index}}">
+                    <image src="{{item}}"/>
+                </view>   
+              </view>
+            </navigator>
+            <text class="loadTip" wx:if="{{loadMore}}">加载中...</text> 
+          </view>                                                                                                     
+    <view class="refresh" bindtap="onTop"><image class="refresh_img" src="../images/top.png"/></view>    
+</view>

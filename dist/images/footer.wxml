@@ -1,0 +1,4 @@
+
+  <view class="footer flex_around">
+    <button open-type="share" class="share">分享给朋友</button>
+  </view>

@@ -1,0 +1,12 @@
+
+  <view class="detail">
+    <import src="../plugins/wxParse/wxParse.wxml"/>
+    <image class="detail_top--image" src="{{detailContent.image}}"/>
+    <view class="title">{{detailContent.title}}</view>
+    <template is="wxParse" data="{{wxParseData:body.nodes}}"/>
+    
+  <view class="footer flex_around">
+    <button open-type="share" class="share">分享给朋友</button>
+  </view>
+
+  </view>
